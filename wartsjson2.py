@@ -189,7 +189,17 @@ for item in DailyList:
 	of9.close()
 
 	# reset trace list
-	trace = ''
+	del trace[:]
+	#trace = ''
+	del all_src[:]
+	unique_src.clear()
+	del all_dst[:]
+	unique_dst.clear()
+	del all_ip[:]
+	unique_ip.clear()
+	del all_trace[:]
+	unique_trace.clear()
+
 
 	# for every 10, start a new file to save memory
 	if (counter % 10 == 0) or (counter == list_length):
@@ -209,19 +219,11 @@ for item in DailyList:
 		of11.close()
 
 		# reset containers for all unique values
-		total_all_trace = set()
-		total_all_ip = set()
+		total_all_trace.clear()
+		total_all_ip.clear()
 
 		# increment list counter
 		list_count += 1
-
-
-#of9 = open("stats.txt", "a")
-
-#of9.write("Total IP's: " + str(total_all_ip_count) + '\n')
-#of9.write("Total Traces: " + str(total_all_trace_count) + '\n')
-
-#of9.close()
 
 
 # find ip totals
@@ -229,7 +231,7 @@ count = 1
 list_count = 9
 
 # reset containers
-total_all_ip = set()
+total_all_ip.clear()
 total_all_ip_count = 0
 
 # for each file, combine unique values in one list
@@ -246,13 +248,13 @@ while (count <= list_count):
 		of.write(item + '\n')
 		total_all_ip_count += 1
 	of.close()
-	total_all_ip = set()
+	total_all_ip.clear()
 
 # find trace totals
 count = 1
 
 # reset containers
-total_all_trace = set()
+total_all_trace.clear()
 total_all_trace_count = 0
 
 # for each file, combine all unique values in one list
@@ -269,7 +271,7 @@ while (count <= list_count):
 		of.write(item + '\n')
 		total_all_trace_count += 1
 	of.close()
-	total_all_trace = set()
+	total_all_trace.clear()
 
 # append stats to the end of list for totals
 f = open("stats.txt", "a")
