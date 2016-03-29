@@ -8,11 +8,14 @@ import string
 import gzip
 import hashlib
 
+# set counter for DailyList
 counter = 1
 
+# container for all unique ip's and traces
 total_all_trace = set()
 total_all_ip = set()
 
+# counters for all unique ip's and traces
 total_all_trace_count = 0
 total_all_ip_count = 0
 list_count = 1
@@ -25,12 +28,16 @@ for item in f:
 	DailyList.append(item[2])
 f.close()
 
+# get length of list
 list_length = len(DailyList)
 
+# iterate throuth DailyList
 for item in DailyList:
 
+	# get value for address
 	address = item
 
+	# fresh assignment of lists and sets
 	all_src = []
 	unique_src = set()
 	all_dst = []
@@ -40,6 +47,7 @@ for item in DailyList:
 	all_trace = []
 	unique_trace = set()
 
+	# fresh counters
 	t_src = 0
 	u_src = 0
 	t_dst = 0
@@ -49,6 +57,7 @@ for item in DailyList:
 	t_trace = 0
 	u_trace = 0
 
+	# open files each time
 	of1 = open("total_src.txt", "w")
 	of2 = open("unique_src.txt", "w")
 	of3 = open("total_dst.txt", "w")
@@ -62,7 +71,6 @@ for item in DailyList:
 	# download page from internet and store in filesystem
 	urllib.urlretrieve("https://topo-data.caida.org/team-probing/list-7.allpref24/team-1/daily/2016/cycle-20160103/" + address, "warts.gz")
 
-
 	#os.system("zcat warts.gz | sc_warts2json > warts.json")
 	inF = gzip.open("warts.gz", "rb")
 	outF = open("warts", "wb")
@@ -70,19 +78,23 @@ for item in DailyList:
 	inF.close()
 	outF.close()
 
+	# read binary file and convert to text
 	os.system("sc_warts2json warts > warts.json")
 
+	# open file for read
 	f = open("warts.json", "r")
 
+	# print counter for visual affirmation
 	print (counter)
 	counter += 1
 
-	loadcount = 1
-
+	# read through each line in file
 	for line in f:
 		try:
+			# decode json
 			myjson = json.loads(line)
 
+			# find dictionary values and catch
 			src = myjson['src']
 
 			all_src.append(src)
@@ -103,6 +115,7 @@ for item in DailyList:
 
 			trace = []
 
+			# build strings for trace
 			for item in hops:
 				addr = item['addr']
 				all_ip.append(addr)
@@ -110,16 +123,23 @@ for item in DailyList:
 				total_all_ip.add(addr)
 				trace.append(addr + ' ')
 
+			# strip extra characters from list
 			list1 = ''.join(trace)
 
-			all_trace.append(list1)
-			unique_trace.add(list1)
-			total_all_trace.add(list1)
+			# get hash of trace
+			m = hashlib.md5()
+			m.update(list1)
+
+			# store all hashed traces
+			all_trace.append(m.hexdigest())
+			unique_trace.add(m.hexdigest())
+			total_all_trace.add(m.hexdigest())
 
 
 		except:
 			"Failed to read ", counter
 
+	# write to file and keep count
 	for item in all_src:
 		of1.write(item+' ')
 		t_src += 1
@@ -145,6 +165,7 @@ for item in DailyList:
 		of8.write(item+'\n')
 		u_trace += 1
 
+	# for each iteration, print stats to file (each vantage point)
 	of9.write(address + '\n')
 	of9.write("Total Source IPs: " + str(t_src) + '\n')
 	of9.write("Unique Source IPs: " + str(u_src) + '\n')
@@ -156,6 +177,7 @@ for item in DailyList:
 	of9.write("Unique Traces: " + str(u_trace) + '\n')
 	of9.write("*************************************\n")
 
+	# close files
 	of1.close()
 	of2.close()
 	of3.close()
@@ -166,29 +188,91 @@ for item in DailyList:
 	of8.close()
 	of9.close()
 
+	# reset trace list
 	trace = ''
 
+	# for every 10, start a new file to save memory
 	if (counter % 10 == 0) or (counter == list_length):
-		of10 = open("all_unique_ip_" + str(list_count) + ".txt", "w")
-		of11 = open("all_unique_trace_" + str(list_count) + ".txt", "w")
+		of10 = open("/home/jay/Ark/cycle-1/all_unique_ip_" + str(list_count) + ".txt", "w")
+		of11 = open("/home/jay/Ark/cycle-1/all_unique_trace_" + str(list_count) + ".txt", "w")
 
+		# write to file
 		for item in total_all_ip:
-			of10.write(item + ' ')
+			of10.write(item + '\n')
 			total_all_ip_count += 1
 		for item in total_all_trace:
 			of11.write(item + '\n')
 			total_all_trace_count += 1
 
+		# close files
 		of10.close()
 		of11.close()
 
+		# reset containers for all unique values
 		total_all_trace = set()
 		total_all_ip = set()
 
+		# increment list counter
+		list_count += 1
 
-of9 = open("stats.txt", "a")
 
-of9.write("Total IP's: " + str(total_all_ip_count) + '\n')
-of9.write("Total Traces: " + str(total_all_trace_count) + '\n')
+#of9 = open("stats.txt", "a")
 
-of9.close()
+#of9.write("Total IP's: " + str(total_all_ip_count) + '\n')
+#of9.write("Total Traces: " + str(total_all_trace_count) + '\n')
+
+#of9.close()
+
+
+# find ip totals
+count = 1
+list_count = 9
+
+# reset containers
+total_all_ip = set()
+total_all_ip_count = 0
+
+# for each file, combine unique values in one list
+while (count <= list_count):
+	f = open("/home/jay/Ark/cycle-1/all_unique_ip_" + str(count) + ".txt", "rb")
+	for item in f:
+		total_all_ip.add(item)
+	count += 1
+	f.close()
+
+	# write all unique values to one file
+	of = open("/home/jay/Ark/cycle-1/all_unique_ip.txt", "w")
+	for item in total_all_ip:
+		of.write(item + '\n')
+		total_all_ip_count += 1
+	of.close()
+	total_all_ip = set()
+
+# find trace totals
+count = 1
+
+# reset containers
+total_all_trace = set()
+total_all_trace_count = 0
+
+# for each file, combine all unique values in one list
+while (count <= list_count):
+	f = open("/home/jay/Ark/cycle-1/all_unique_trace_" + str(count) + ".txt", "rb")
+	for item in f:
+		total_all_trace.add(item)
+	count += 1
+	f.close()
+
+	# write all unique values to one file
+	of = open("/home/jay/Ark/cycle-1/all_unique_trace.txt", "w")
+	for item in total_all_trace:
+		of.write(item + '\n')
+		total_all_trace_count += 1
+	of.close()
+	total_all_trace = set()
+
+# append stats to the end of list for totals
+f = open("stats.txt", "a")
+f.write("Total IP's: " + str(total_all_ip_count) + '\n')
+f.write("Total Traces: " + str(total_all_trace_count) + '\n')
+f.close()
