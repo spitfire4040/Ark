@@ -22,7 +22,7 @@ list_count = 1
 
 # build list of daily files
 DailyList = []
-f = open("daily1.txt", "r")
+f = open("daily3.txt", "r")
 for item in f:
 	item = item.split()
 	DailyList.append(item[2])
@@ -36,6 +36,9 @@ for item in DailyList:
 
 	# get value for address
 	address = item
+
+	# reset list_count
+	list_count = 1
 
 	# fresh assignment of lists and sets
 	all_src = []
@@ -69,7 +72,7 @@ for item in DailyList:
 	of9 = open("stats.txt", "a")
 
 	# download page from internet and store in filesystem
-	urllib.urlretrieve("https://topo-data.caida.org/team-probing/list-7.allpref24/team-1/daily/2016/cycle-20160103/" + address, "warts.gz")
+	urllib.urlretrieve("https://topo-data.caida.org/team-probing/list-7.allpref24/team-3/daily/2016/cycle-20160103/" + address, "warts.gz")
 
 	#os.system("zcat warts.gz | sc_warts2json > warts.json")
 	inF = gzip.open("warts.gz", "rb")
@@ -203,8 +206,8 @@ for item in DailyList:
 
 	# for every 10, start a new file to save memory
 	if (counter % 10 == 0) or (counter == list_length):
-		of10 = open("/home/jay/Ark/cycle-1/all_unique_ip_" + str(list_count) + ".txt", "w")
-		of11 = open("/home/jay/Ark/cycle-1/all_unique_trace_" + str(list_count) + ".txt", "w")
+		of10 = open("/home/jay/Ark/cycle-3/all_unique_ip_" + str(list_count) + ".txt", "w")
+		of11 = open("/home/jay/Ark/cycle-3/all_unique_trace_" + str(list_count) + ".txt", "w")
 
 		# write to file
 		for item in total_all_ip:
@@ -228,7 +231,6 @@ for item in DailyList:
 
 # find ip totals
 count = 1
-list_count = 9
 
 # reset containers
 total_all_ip.clear()
@@ -236,14 +238,14 @@ total_all_ip_count = 0
 
 # for each file, combine unique values in one list
 while (count <= list_count):
-	f = open("/home/jay/Ark/cycle-1/all_unique_ip_" + str(count) + ".txt", "rb")
+	f = open("/home/jay/Ark/cycle-3/all_unique_ip_" + str(count) + ".txt", "rb")
 	for item in f:
 		total_all_ip.add(item)
 	count += 1
 	f.close()
 
 	# write all unique values to one file
-	of = open("/home/jay/Ark/cycle-1/all_unique_ip.txt", "w")
+	of = open("/home/jay/Ark/cycle-3/all_unique_ip.txt", "w")
 	for item in total_all_ip:
 		of.write(item + '\n')
 		total_all_ip_count += 1
@@ -259,14 +261,14 @@ total_all_trace_count = 0
 
 # for each file, combine all unique values in one list
 while (count <= list_count):
-	f = open("/home/jay/Ark/cycle-1/all_unique_trace_" + str(count) + ".txt", "rb")
+	f = open("/home/jay/Ark/cycle-3/all_unique_trace_" + str(count) + ".txt", "rb")
 	for item in f:
 		total_all_trace.add(item)
 	count += 1
 	f.close()
 
 	# write all unique values to one file
-	of = open("/home/jay/Ark/cycle-1/all_unique_trace.txt", "w")
+	of = open("/home/jay/Ark/cycle-3/all_unique_trace.txt", "w")
 	for item in total_all_trace:
 		of.write(item + '\n')
 		total_all_trace_count += 1
