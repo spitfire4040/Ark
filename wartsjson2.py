@@ -119,12 +119,15 @@ for item in DailyList:
 			trace = []
 
 			# build strings for trace
+			test = ''
 			for item in hops:
 				addr = item['addr']
 				all_ip.append(addr)
 				unique_ip.add(addr)
 				total_all_ip.add(addr)
-				trace.append(addr + ' ')
+				if addr != test:
+					trace.append(addr + ' ')
+				test = addr
 
 			# strip extra characters from list
 			list1 = ''.join(trace)
