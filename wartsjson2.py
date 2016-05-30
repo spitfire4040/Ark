@@ -8,6 +8,10 @@ import string
 import gzip
 import hashlib
 
+# prefix1 = https://topo-data.caida.org/team-probing/list-7.allpref24/team-1/
+# prefix2 = 
+# prefix3 = 
+
 # set counter for DailyList
 counter = 1
 
@@ -139,8 +143,8 @@ for item in DailyList:
 			list1 = ''.join(trace)
 
 			# get hash of trace
-			m = hashlib.md5()
-			m.update(list1)
+			#m = hashlib.md5() *************
+			#m.update(list1)   *************
 
 			# store all hashed traces
 			all_trace.append(m.hexdigest())
