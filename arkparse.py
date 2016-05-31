@@ -3,120 +3,213 @@ import sys
 import os
 import os.path
 
-# cycle through all 3 teams
-for x in range(1, 4):
-	print '***********'
+# cycle through each day
+for y in range(1, 4):
 
-	# cycle through each day
-	for y in range(1, 4):
-		print '###########'
+	# re-initialize variables each time (clear)
+	trace = []
 
-		# re-initialize variables each time (clear)
-		trace = []
-		all_trace = []
-		unique_trace = set()
+	all_trace = []
+	unique_trace = set()
 
-		src = ''
-		dst = ''
-		hop = ''
-		ip = ''
-		addr = ''	
+	all_ip = []
+	unique_ip = set()
 
-		# check for directories and create if necessary
-		if not os.path.exists("/home/jay/Desktop/Ark3/output"):
-			os.makedirs("/home/jay/Desktop/Ark3/output")
+	edgeList = set()
 
-		if not os.path.exists("/home/jay/Desktop/Ark3/output/team-" + str(x)):
-			os.makedirs("/home/jay/Desktop/Ark3/output/team-" + str(x))
+	src = ''
+	dst = ''
+	hop = ''
+	ip = ''
+	addr = ''
 
-		if not os.path.exists("/home/jay/Desktop/Ark3/output/team-" + str(x) + "/day-" + str(y)):
-			os.makedirs("/home/jay/Desktop/Ark3/output/team-" + str(x) + "/day-" + str(y))	
+	starCounter = 1
+	count = 1
 
-		# cycle through each file for team/day
-		for filename in os.listdir("/home/jay/Desktop/Ark3/team-" + str(x) + "/day-" + str(y)):
+	# open files for write
+	out1 = open("/home/jay/Ark/Output/day-" + str(y) + "/all-traces.txt", "w")
+	out2 = open("/home/jay/Ark/Output/day-" + str(y) + "/unique-traces.txt", "w")
+	out3 = open("/home/jay/Ark/Output/day-" + str(y) + "/all-ip.txt", "w")
+	out4 = open("/home/jay/Ark/Output/day-" + str(y) + "/unique-ip.txt", "w")
+	out5 = open("/home/jay/Ark/Output/day-" + str(y) + "/unique-edge.txt", "w")
+	out6 = open("/home/jay/Ark/Output/day-" + str(y) + "/stats.txt", "w")	
 
-			# print filename for visual affirmation
-			print filename
+	# check for directories and create if necessary
+	if not os.path.exists("/home/jay/Ark/Output"):
+		os.makedirs("/home/jay/Ark3/Output")
 
-			# open file for read
-			f = open("/home/jay/Desktop/Ark3/team-" + str(x) + "/day-" + str(y) + "/" + filename, "r")
+	if not os.path.exists("/home/jay/Ark/Output/day-" + str(y)):
+		os.makedirs("/home/jay/Ark/Output/day-" + str(y))	
 
-			# open files for write
-			out1 = open("/home/jay/Desktop/Ark3/output/team-" + str(x) + "/day-" + str(y) + "/all-traces.txt", "w")
-			out2 = open("/home/jay/Desktop/Ark3/output/team-" + str(x) + "/day-" + str(y) + "/unique-traces.txt", "w")
+	# cycle through each file for team/day
+	for filename in os.listdir("/home/jay/Ark/ark_data_test/day-" + str(y)):
 
-			try:
-				# iterate through each line
-				for line in f:
+		# print filename for visual affirmation
+		print filename
 
-					# split line into pieces
-					line = line.split()
+		# open file for read
+		f = open("/home/jay/Ark/ark_data_test/day-" + str(y) + "/" + filename, "r")
 
-					# build trace string (line not traceroute)
-					if line[0] != 'traceroute':
-						hop = line[0]
-						ip = line[1]
-						addr = ip + '-' + hop + ' '
-						trace.append(addr)
+		try:
+			# iterate through each line
+			for line in f:
 
-					# reset and append running list each time line == traceroute
-					if line[0] == 'traceroute':
+				# split line into pieces
+				line = line.split()
 
-						# get values for src, dst
-						src = line[2]
-						dst = line[4]
+				# build trace string (line not traceroute)
+				if line[0] != 'traceroute':
+					hop = line[0]
+					ip = line[1]
+					addr = ip + '-' + hop + ' '
+					trace.append(addr)
+					all_ip.append(ip)
+					unique_ip.add(ip)
 
-						# check for empty list and append if good
-						if not trace:
-							pass
-						else:
+				# reset and append running list each time line == traceroute
+				if line[0] == 'traceroute':
 
-							# eliminate trailing '*'s
-							while '*' in trace[-1]:
-								del(trace[-1])
+					# get values for src, dst
+					src = line[2]
+					dst = line[4]
 
-							# convert list to string
-							trace = ''.join(trace)
+					all_ip.append(src)
+					all_ip.append(dst)
+					unique_ip.add(src)
+					unique_ip.add(dst)
 
-							# append string to running lists
-							all_trace.append(trace)
-							unique_trace.add(trace)
+					# check for empty list and append if good
+					if not trace:
+						pass
+					else:
 
-						# reset trace
-						trace = []
+						# eliminate trailing '*'s
+						while '*' in trace[-1]:
+							del(trace[-1])
 
-						# append src, dst to new trace
-						trace.append(src + ':' + dst + ' ')
+						# convert list to string
+						trace = ''.join(trace)
 
-			except:
-				pass
+						# append string to running lists
+						all_trace.append(trace)
+						unique_trace.add(trace)
 
-			# once more at end to catch last trace
-			try:
-				# eliminate trailing '*'s
-				while '*' in trace[-1]:
-					del(trace[-1])
+					# reset trace
+					trace = []
 
-				# convert list to string
-				trace = ''.join(trace)
+					# append src, dst to new trace
+					trace.append(src + ':' + dst + ' ')
 
-				# append string to running lists
-				all_trace.append(trace)
-				unique_trace.add(trace)
-			except:
-				pass
+		except:
+			pass
 
-		# write all_trace to file
-		for item in all_trace:
-			out1.write(item)
-			out1.write('\n')
+		# once more at end to catch last trace
+		try:
+			# eliminate trailing '*'s
+			while '*' in trace[-1]:
+				del(trace[-1])
 
-		# write unique_trace to file
-		for item in unique_trace:
-			out2.write(item)
-			out2.write('\n')
+			# convert list to string
+			trace = ''.join(trace)
 
-		# close files
+			# append string to running lists
+			all_trace.append(trace)
+			unique_trace.add(trace)
+		except:
+			pass
+
 		f.close()
-		out1.close()
-		out2.close()
+
+
+	# find edges...
+	# iterate through unique traces
+	for item in unique_trace:
+
+		# set list so it will reset
+		trace = []
+
+		# split trace and push to list
+		for item in item.split():
+			if (':' in item):
+				pass
+			else:
+				item = item.split('-')
+				trace.append(item[0])
+
+		# find length of list
+		length = len(trace)
+
+		# set iterator variable so it will reset
+		i = 0
+
+		# iterate through trace list for pairs
+		while i < length - 1:
+			first = trace[i]
+			second = trace[i+1]
+
+			# set incrementing value for 0's
+			if first == '*' and second == '*':
+				# don't count * - *
+				pass
+
+			else:
+
+				if first == '*':
+					first = count
+					count += 1
+
+				if second == '*':
+					second = count
+					count += 1
+
+			# add to edgeList set (unique values only)
+			edgeList.add(str(first) + ' ' + str(second))
+			i += 1
+
+	# write all_trace to file
+	for item in all_trace:
+		out1.write(item)
+		out1.write('\n')
+
+	# write unique_trace to file
+	for item in unique_trace:
+		out2.write(item)
+		out2.write('\n')
+
+	# write all_ip to file
+	for item in all_ip:
+		out3.write(item)
+		out3.write('\n')
+
+	# write unique_ip to file
+	for item in unique_ip:
+		out4.write(item)
+		out4.write('\n')
+
+	# write unique_ip to file
+	for item in edgeList:
+		out5.write(item)
+		out5.write('\n')
+
+	# write stats
+	out6.write("Total IP: " + str(len(all_ip)) + '\n')
+	out6.write("Unique IP: " + str(len(unique_ip)) + '\n')
+	out6.write("Total Trace: " + str(len(all_trace)) + '\n')
+	out6.write("Unique Trace: " + str(len(unique_trace)) + '\n')
+	out6.write("Unique Edge: " + str(len(edgeList)) + '\n')
+
+	# close files
+	out1.close()
+	out2.close()
+	out3.close()
+	out4.close()
+	out5.close()
+	out6.close()
+
+# get ip and trace counts
+
+# trace count
+os.system("./tracecount")
+
+# ip count
+os.system("./ipcount")
